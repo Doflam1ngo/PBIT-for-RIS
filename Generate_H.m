@@ -55,7 +55,7 @@ G1_AoA1 = atan( (-x_U)./(y_RIS-y_U) );
 G1_AoA2 = atan( (-h_RIS)./sqrt( (y_RIS-y_U).^2 + x_U.^2 ) );
 for k = 1 : K
     G1_hat(:,k) = vec( exp( 1i*pi*( 0 : (N_1 - 1) ).'* sin(G1_AoA1(k))*cos(G1_AoA2(k)) )...
-                  * ( exp( -1i*pi*( 0 : (N_2 - 1) ).'*sin(G1_AoA1(k))*cos(G1_AoA2(k)) ).') );
+                  * ( exp( -1i*pi*( 0 : (N_2 - 1) ).'*sin(G1_AoA1(k))*cos(G1_AoA2(k)) ).') );    %(60)
 end
 G2_AoD1 = pi/2;
 G2_AoD2 = atan( (h_BS - h_RIS)/sqrt( y_RIS^2 ) );
@@ -67,13 +67,13 @@ G2_AoA1 = 0;
 G2_AoA2 = -G2_AoD2;
 G2_BS = vec( exp( -1i*pi*( 0 : (N_1 - 1) ).'* sin(G2_AoA1) )...
                   * ( exp( -1i*pi*( 0 : (N_2 - 1) ).'*sin(G2_AoA2) ).') );              
-G2_hat = G2_BS * (G2_RIS.') ;
+G2_hat = G2_BS * (G2_RIS.') ;        %(61)
 %% Rayleigh component
 G1_tilde = sqrt(0.5)*(randn(N, K) + 1i*randn(N, K)) ;
 G2_tilde = sqrt(0.5)*(randn(M, N) + 1i*randn(M, N)) ;
 % generate channel
-G1 = sqrt(K1/(1+K1))*G1_hat + sqrt(1/(1+K1))*G1_tilde ;
-G2 = sqrt(K2/(1+K2))*G2_hat + sqrt(1/(1+K2))*G2_tilde ;
+G1 = sqrt(K1/(1+K1))*G1_hat + sqrt(1/(1+K1))*G1_tilde ;    % (55)
+G2 = sqrt(K2/(1+K2))*G2_hat + sqrt(1/(1+K2))*G2_tilde ;    % (56)
 H0 = sqrt(0.5)*(randn(M, K) + 1i*randn(M, K)) ;
 %H0 = zeros(M, K);
 H0 = H0 * diag(fad_H0) ;
