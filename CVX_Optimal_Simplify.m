@@ -11,9 +11,9 @@ function [ Theta ] = CVX_Optimal_Simplify( G1, G2, H0, rho, nuw, S )
 [N, K] = size(G1);
 [M, ~] = size(G2);
 Px = eye(K) ;  % C_{xx}
-GPG = G1 * Px * (G1') ;
+GPG = G1 * Px * (G1') ;    % (36)
 V = diag(sqrt(diag(GPG))); 
-H0I = H0 * Px * (H0') + nuw * eye(M) ;
+H0I = H0 * Px * (H0') + nuw * eye(M) ;    % (36)
 theta = randn(N, 1) + 1i*randn(N, 1) ;
 theta = theta./abs( theta ) ;
 Theta = diag(theta);
@@ -33,12 +33,12 @@ for iter = 1 : Op_iter_NM
     C_xy = C_yx' ;
     C_yy = G2 * Theta * ( rho^2 * GPG + rho*(1-rho)*diag(diag(GPG)) )* (Theta') * (G2') ...
            +   rho * ( G2 * Theta * G1 * Px * (H0') )  + H0I ...
-           +   rho * ( G2 * Theta * G1 * Px * (H0') )' ;   
+           +   rho * ( G2 * Theta * G1 * Px * (H0') )' ;       % (36)
        
 %Rate_ite(iter) = real( log2(det(Sigma)) + trace( Sigma\(Px - Phi*C_yx - (Phi*C_yx)' + Phi*C_yy*Phi') ) );            
        
-    Phi = C_xy / C_yy ;
-    Sigma = Px - Phi * C_yx ;  
+    Phi = C_xy / C_yy ;        % (34)
+    Sigma = Px - Phi * C_yx ;  % (37)
 
 %Rate_ite(iter) = Rate_ite(iter) - real( log2(det(Sigma)) + trace( Sigma\(Px - Phi*C_yx - (Phi*C_yx)' + Phi*C_yy*Phi') ) );         
     
@@ -46,13 +46,13 @@ for iter = 1 : Op_iter_NM
     
 %% Optimal (Theta) for fixed (Phi, Sigma)
     alpha =  rho*diag( G1 * Px *( (H0') * (Phi') - eye(K) )/Sigma * Phi * G2 );
-    alpha =  conj(alpha);
-    A = (G2')* (Phi') /Sigma * Phi * G2 ;
+    alpha =  conj(alpha);    % (30)
+    A = (G2')* (Phi') /Sigma * Phi * G2 ;    
     Lambda = zeros(N, N) ;
     for k = 1 : K
         Lambda = Lambda + diag(G1(:,k)') * A * diag(G1(:,k)) ;
     end
-    Lambda  =  rho^2 * Lambda + rho*(1-rho)* diag(diag((V') * A * V)) ;
+    Lambda  =  rho^2 * Lambda + rho*(1-rho)* diag(diag((V') * A * V)) ;    % (29)
         R = [ Lambda , alpha; ...
           (alpha') , 0   ];
     R = ( R + R' )/2; 
