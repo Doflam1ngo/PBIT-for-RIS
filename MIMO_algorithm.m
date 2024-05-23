@@ -2,9 +2,9 @@ function results = MIMO_algorithm(optIn, SNR)
 
 
 %% System setting
-K = optIn.K;
-M = optIn.M;
-N = optIn.N;
+K = optIn.K;    % anten phát
+M = optIn.M;    % anten thu
+N = optIn.N;    % Ăng-ten IRS    
 T = optIn.T;
 rho = optIn.rho;
 
@@ -15,9 +15,9 @@ nuw = 10^(-SNR/10) ;
 Rete_ite = 0 ;
 %% Produce System Model 
 
-if QAM == 4
+if QAM == 4    % QBSK
     Sam = [1+1i -1+1i -1-1i 1-1i]./sqrt(2);    
-elseif QAM == 16    
+elseif QAM == 16      % QAM  
     Sam = [1+1i -1+1i -1-1i 1-1i 3+1i -1+3i -3-1i 1-3i 3+3i -3+3i -3-3i 3-3i 1+3i -3+1i -1-3i 3-1i]./sqrt(10);
 end
 % produce s
@@ -42,16 +42,16 @@ end
 H = zeros(M, K, N+1);
 H(:, :, 1) = H0 ;
 for n = 1 : N
-    H(:, :, n+1) = theta(n,n) * G2(:, n) * G1(n, :) ;
+    H(:, :, n+1) = theta(n,n) * G2(:, n) * G1(n, :) ;    % CT (2); MTran 3 chiều 32x4x33
 end
 % produce X 
-B = randi([0,1], sqrt(QAM)*K, T);
-X = Constell_Modulate(B, Sam);
+B = randi([0,1], sqrt(QAM)*K, T);  % QAM, tín hiệu X được điều chế bằng biểu đồ chòm sao
+X = Constell_Modulate(B, Sam);    % X là vectơ tín hiệu truyền
 % produce Y
 A = sum(S .* H, 3) ;
 Z = A * X;
 %aa = norm( Z , 'fro')^2 / numel(Z)
-Y = Z + sqrt(nuw/2)*(randn(size(Z))+1i*randn(size(Z)));
+Y = Z + sqrt(nuw/2)*(randn(size(Z))+1i*randn(size(Z)));    % Y là tín hiệu quan sát được
 
 %% Initialize results as empty and send PrioriIn information 
 results = [] ;
@@ -65,7 +65,7 @@ PrioriIn.rho = rho ;
 
 %%  EM  module
 
-    [results1] = MIMO_EM( optIn, PrioriIn );
+    [results1] = MIMO_EM( optIn, PrioriIn );        % EM: Expectation-Maximization
     [resultsX] = MIMO_EMX( optIn, PrioriIn );
     [resultsS] = MIMO_EMS( optIn, PrioriIn );
     
